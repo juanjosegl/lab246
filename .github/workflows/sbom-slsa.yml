@@ -160,12 +160,13 @@ jobs:
             --print-provenance > reports/procedencia-slsa.json 2> reports/slsa-verifier.txt
           cat reports/slsa-verifier.txt
 
-      # El SAN del certificado es el workflow que llama (este archivo); la identidad del
-      # generador va en la extensión "Build Signer URI", que valida slsa-verifier.
+      # El generador guarda la procedencia en el formato clásico de cosign (etiqueta .att);
+      # cosign v3 busca por defecto el formato nuevo, donde solo está la atestación del SBOM.
+      # La procedencia la firma el propio generador, no este workflow.
       - name: cosign verify-attestation (procedencia SLSA)
         run: |
-          cosign verify-attestation --type slsaprovenance "$REF" \
-            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/sbom-slsa.yml@refs/heads/main" \
+          cosign verify-attestation --type slsaprovenance --new-bundle-format=false "$REF" \
+            --certificate-identity "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@refs/tags/v2.1.0" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             > /dev/null 2> reports/cosign-verify-slsa.txt
           cat reports/cosign-verify-slsa.txt
