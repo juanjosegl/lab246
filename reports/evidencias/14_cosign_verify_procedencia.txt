@@ -1,0 +1,16 @@
+> cosign verify-attestation --type slsaprovenance --new-bundle-format=false ghcr.io/juanjosegl/lab246@sha256:789899025e7f455936e58896c2a9a7607b77e79b7edb7d139c9eab6d44bf100a --certificate-identity https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@refs/tags/v2.1.0 --certificate-oidc-issuer https://token.actions.githubusercontent.com
+
+Verification for ghcr.io/juanjosegl/lab246@sha256:789899025e7f455936e58896c2a9a7607b77e79b7edb7d139c9eab6d44bf100a --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+Certificate subject: https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@refs/tags/v2.1.0
+Certificate issuer URL: https://token.actions.githubusercontent.com
+GitHub Workflow Trigger: push
+GitHub Workflow SHA: c2558cfe76d3c0f6a526a5aefa5e25a9bedc13dc
+GitHub Workflow Name: SBOM y SLSA
+GitHub Workflow Repository: juanjosegl/lab246
+GitHub Workflow Ref: refs/heads/main
+{"payloadType":"application/vnd.in-toto+json","payload":"eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjAuMSIs…(DSSE en base64, recortado)"}
+exit=0

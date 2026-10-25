@@ -1,0 +1,12 @@
+> scripts/06-verificar-atestacion.ps1 -ImageDigest ghcr.io/juanjosegl/lab246@sha256:789899025e7f455936e58896c2a9a7607b77e79b7edb7d139c9eab6d44bf100a   (identidad exacta del workflow)
+=== cosign verify-attestation (CycloneDX) ===
+
+Verification for ghcr.io/juanjosegl/lab246@sha256:789899025e7f455936e58896c2a9a7607b77e79b7edb7d139c9eab6d44bf100a --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+predicateType : https://cyclonedx.org/bom
+sujeto        : ghcr.io/juanjosegl/lab246@sha256:789899025e7f455936e58896c2a9a7607b77e79b7edb7d139c9eab6d44bf100a
+SBOM adjunto  : CycloneDX 1.7, 958 componentes
+exit=0

@@ -1,0 +1,4 @@
+> slsa-verifier verify-image ghcr.io/juanjosegl/lab246@sha256:789899025e7f455936e58896c2a9a7607b77e79b7edb7d139c9eab6d44bf100a --source-uri github.com/juanjosegl/lab246 --source-branch main
+Verified build using builder "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@refs/tags/v2.1.0" at commit c2558cfe76d3c0f6a526a5aefa5e25a9bedc13dc
+PASSED: SLSA verification passed
+exit=0

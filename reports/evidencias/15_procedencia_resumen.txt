@@ -1,0 +1,13 @@
+### Procedencia SLSA (decodificada de la atestación verificada por slsa-verifier)
+_type          : https://in-toto.io/Statement/v0.1
+predicateType  : https://slsa.dev/provenance/v0.2
+subject        : ghcr.io/juanjosegl/lab246@sha256:789899025e7f455936e58896c2a9a7607b77e79b7edb7d139c9eab6d44bf100a
+builder.id     : https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@refs/tags/v2.1.0
+buildType      : https://github.com/slsa-framework/slsa-github-generator/container@v1
+configSource   : git+https://github.com/juanjosegl/lab246@refs/heads/main
+commit (sha1)  : c2558cfe76d3c0f6a526a5aefa5e25a9bedc13dc
+entryPoint     : .github/workflows/sbom-slsa.yml
+evento         : push
+run_id         : 40158885849 (intento 1)
+buildInvocationID: 40158885849-1
+materials      : git+https://github.com/juanjosegl/lab246@refs/heads/main@c2558cfe76d3c0f6a526a5aefa5e25a9bedc13dc

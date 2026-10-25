@@ -1,0 +1,3 @@
+> slsa-verifier verify-image ghcr.io/juanjosegl/lab246@sha256:789899025e7f455936e58896c2a9a7607b77e79b7edb7d139c9eab6d44bf100a --source-uri github.com/otro-usuario/lab246 --source-branch main   (repositorio falso: debe fallar)
+FAILED: SLSA verification failed: source used to generate the binary does not match provenance: expected source 'otro-usuario/lab246', got 'juanjosegl/lab246'
+exit=1
