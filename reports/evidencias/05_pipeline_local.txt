@@ -1,0 +1,78 @@
+> scripts/pipeline-local.ps1   (Dockerfile corregido: golang:1.27)
+=== SBOM del código ===
+=== Build de lab246:1.0.0 ===
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 383B done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 0.5s
+
+#3 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#3 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#3 CACHED
+
+#4 [internal] load metadata for docker.io/library/golang:1.27
+#4 DONE 0.4s
+
+#5 [internal] load metadata for gcr.io/distroless/static-debian12:nonroot
+#5 DONE 0.5s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 117B done
+#6 DONE 0.0s
+
+#7 [build 1/6] FROM docker.io/library/golang:1.27@sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc
+#7 resolve docker.io/library/golang:1.27@sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc 0.0s done
+#7 DONE 0.0s
+
+#8 [stage-1 1/3] FROM gcr.io/distroless/static-debian12:nonroot@sha256:afa5c872c891853ca7fcf1f12c3edb23f7eeef36189728842dd51042ff57f7ab
+#8 resolve gcr.io/distroless/static-debian12:nonroot@sha256:afa5c872c891853ca7fcf1f12c3edb23f7eeef36189728842dd51042ff57f7ab 0.0s done
+#8 DONE 0.0s
+
+#9 [internal] load build context
+#9 transferring context: 113B done
+#9 DONE 0.0s
+
+#10 [build 2/6] WORKDIR /src
+#10 CACHED
+
+#11 [build 3/6] COPY go.mod go.sum* ./
+#11 DONE 0.0s
+
+#12 [build 4/6] RUN go mod download
+#12 0.188 go: no module dependencies to download
+#12 DONE 0.2s
+
+#13 [build 5/6] COPY . .
+#13 DONE 0.0s
+
+#14 [build 6/6] RUN CGO_ENABLED=0 GOOS=linux go build -trimpath     -ldflags="-s -w" -o /app ./app
+#14 DONE 6.9s
+
+#8 [stage-1 1/3] FROM gcr.io/distroless/static-debian12:nonroot@sha256:afa5c872c891853ca7fcf1f12c3edb23f7eeef36189728842dd51042ff57f7ab
+#8 CACHED
+
+#15 [stage-1 2/3] COPY --from=build /app /app
+#15 DONE 0.1s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.2s done
+#16 exporting manifest sha256:141e68979adf461b976fab7cfb6afd6b5c0333df007a4b32e88b69bdae23ab6a done
+#16 exporting config sha256:e25ef48bcb7719ed83e4141ddeda56100654dd4eed2dc1a328ba1f3ade3ab09a done
+#16 exporting attestation manifest sha256:e545ee9d129812f55a3fb7985901baf393bbbcbfb538ab2ba2d6f06a1b97d8af done
+#16 exporting manifest list sha256:14ff1072faf89f874bdbfd8eb7ae456435376b9bbf65877d44e19bc3b806762d done
+#16 naming to docker.io/library/lab246:1.0.0 done
+#16 unpacking to docker.io/library/lab246:1.0.0 0.0s done
+#16 DONE 0.3s
+=== SBOM de la imagen lab246:1.0.0 ===
+=== Grype: reporte JSON ===
+[0000]  WARN go binary packages were found but none carry function symbols; go vulnerability matching falls back to module granularity and may report false positives. if scanning an SBOM, regenerate it with symbol capture enabled for more precise results.
+=== Grype: gate (falla con high o superior) ===
+[0000]  WARN go binary packages were found but none carry function symbols; go vulnerability matching falls back to module granularity and may report false positives. if scanning an SBOM, regenerate it with symbol capture enabled for more precise results.
+No vulnerabilities found
+=== Pipeline local completado: reportes en reports/ ===
+exit=0

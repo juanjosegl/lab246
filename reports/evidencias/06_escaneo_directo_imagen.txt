@@ -1,0 +1,20 @@
+> grype lab246:1.0.0
+No vulnerabilities found
+exit=0
+
+> trivy image --severity HIGH,CRITICAL lab246:1.0.0
+
+Report Summary
+
+┌─────────────────────────────┬──────────┬─────────────────┬─────────┐
+│           Target            │   Type   │ Vulnerabilities │ Secrets │
+├─────────────────────────────┼──────────┼─────────────────┼─────────┤
+│ lab246:1.0.0 (debian 12.15) │  debian  │        0        │    -    │
+├─────────────────────────────┼──────────┼─────────────────┼─────────┤
+│ app                         │ gobinary │        0        │    -    │
+└─────────────────────────────┴──────────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+exit=0

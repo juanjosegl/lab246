@@ -1,0 +1,16 @@
+### SBOM del código (syft dir:.)
+CycloneDX 1.7: 0 componentes (0 paquetes, 0 archivos; 0 con hash)
+SPDX SPDX-2.3: 1 paquetes, 0 archivos, 1 relaciones
+
+### SBOM de la imagen final lab246:1.0.0 (golang:1.27)
+CycloneDX 1.7: 958 componentes (8 paquetes, 950 archivos; 950 con hash)
+SPDX SPDX-2.3: 8 paquetes, 950 archivos, 965 relaciones
+  - base-files       12.4+deb12u15          sha256:fd7e4aae7e7b05f217bcf2d02322825c3 pkg:deb/debian/base-files@12.4%2Bdeb12u15?arch=arm64&distro=debian-12.
+  - ca-certificates  20250419~deb12u1       GPL-2.0-only,GPL-2.0-or-later,MPL-2.0    pkg:deb/debian/ca-certificates@20250419~deb12u1?arch=all&distro=debian
+  - lab246           UNKNOWN                                                         pkg:golang/lab246
+  - media-types      10.0.0                 ad-hoc                                   pkg:deb/debian/media-types@10.0.0?arch=all&distro=debian-12.15
+  - netbase          6.4                    GPL-2.0-only                             pkg:deb/debian/netbase@6.4?arch=all&distro=debian-12.15
+  - stdlib           go1.27.3               BSD-3-Clause                             pkg:golang/stdlib@1.27.3
+  - tzdata           2026b-0+deb12u1        public-domain                            pkg:deb/debian/tzdata@2026b-0%2Bdeb12u1?arch=all&distro=debian-12.15
+  - debian           12.15                                                           
+

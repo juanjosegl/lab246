@@ -1,0 +1,6 @@
+> scripts/01-generar-sbom.ps1
+=== SBOM del código ===
+exit=0
+
+> componentes en el SBOM del código (CycloneDX): 0
+> paquetes en el SBOM del código (SPDX): 1 (lab246)

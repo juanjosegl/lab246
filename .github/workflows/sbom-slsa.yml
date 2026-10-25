@@ -1,0 +1,176 @@
+name: SBOM y SLSA
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "reports/**"
+      - "*.md"
+  workflow_dispatch:
+
+# Sin permisos por defecto: cada job declara solo los que necesita.
+permissions: {}
+
+env:
+  IMAGEN: ghcr.io/${{ github.repository_owner }}/lab246
+  TAG: 1.0.0
+  SYFT: anchore/syft:v1.55.0
+  GRYPE: anchore/grype:v0.121.0
+
+jobs:
+  build:
+    name: Build, SBOM, escaneo y atestación
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write   # publicar en GHCR y subir la atestación
+      id-token: write   # token OIDC para firmar sin llaves
+    outputs:
+      image: ${{ steps.publicar.outputs.image }}
+      digest: ${{ steps.publicar.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 1. Build de la imagen
+        run: docker build -t "$IMAGEN:$TAG" .
+
+      - name: 2. Publicar en GHCR
+        id: publicar
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push "$IMAGEN:$TAG"
+          ref=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGEN:$TAG")
+          echo "image=$IMAGEN" >> "$GITHUB_OUTPUT"
+          echo "digest=${ref#*@}" >> "$GITHUB_OUTPUT"
+          echo "REF=$ref" >> "$GITHUB_ENV"
+          mkdir -p reports && echo "$ref" | tee reports/digest.txt
+
+      # El SBOM se genera en el mismo job y sobre el mismo digest publicado,
+      # así describe exactamente el artefacto que se entrega.
+      - name: 3. SBOM del código y de la imagen (CycloneDX y SPDX)
+        env:
+          SYFT_REGISTRY_AUTH_AUTHORITY: ghcr.io
+          SYFT_REGISTRY_AUTH_USERNAME: ${{ github.actor }}
+          SYFT_REGISTRY_AUTH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src "$SYFT" dir:. --source-name lab246 --source-version "$TAG" \
+            --exclude './reports/**' --exclude './.git/**' \
+            -o cyclonedx-json=reports/sbom-codigo.cdx.json -o spdx-json=reports/sbom-codigo.spdx.json
+          docker run --rm -v "$PWD/reports:/out" \
+            -e SYFT_REGISTRY_AUTH_AUTHORITY -e SYFT_REGISTRY_AUTH_USERNAME -e SYFT_REGISTRY_AUTH_PASSWORD \
+            "$SYFT" "registry:$REF" \
+            -o cyclonedx-json=/out/sbom-imagen.cdx.json -o spdx-json=/out/sbom-imagen.spdx.json
+
+      - name: 4. Escanear el SBOM con Grype (gate HIGH)
+        run: |
+          grype() { docker run --rm -v "$PWD/reports:/out" -v grype-db:/root/.cache/grype "$GRYPE" "$@"; }
+          grype sbom:/out/sbom-imagen.cdx.json -o json --file /out/grype-resultados.json
+          grype sbom:/out/sbom-imagen.cdx.json -o table --fail-on high | tee reports/grype-tabla.txt
+
+      - name: Publicar SBOM CycloneDX
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: |
+            reports/sbom-codigo.cdx.json
+            reports/sbom-imagen.cdx.json
+
+      - name: Publicar SBOM SPDX
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-spdx
+          path: |
+            reports/sbom-codigo.spdx.json
+            reports/sbom-imagen.spdx.json
+
+      - name: Publicar resultados de Grype
+        uses: actions/upload-artifact@v4
+        with:
+          name: grype-resultados
+          path: |
+            reports/grype-resultados.json
+            reports/grype-tabla.txt
+
+      - uses: sigstore/cosign-installer@v4.1.2
+
+      - name: 5. Adjuntar el SBOM como atestación firmada
+        run: |
+          cosign attest --yes --predicate reports/sbom-imagen.cdx.json --type cyclonedx "$REF" 2>&1 \
+            | tee reports/cosign-attest.txt
+
+      - name: 6. Verificar la atestación del SBOM
+        run: |
+          identidad="https://github.com/${{ github.repository }}/.github/workflows/sbom-slsa.yml@refs/heads/main"
+          cosign verify-attestation --type cyclonedx "$REF" \
+            --certificate-identity "$identidad" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            > reports/cosign-verify-attestation.json 2> reports/cosign-verify-attestation.txt
+          cat reports/cosign-verify-attestation.txt
+
+      - name: Conservar evidencias de la atestación
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atestacion-sbom
+          path: |
+            reports/digest.txt
+            reports/cosign-attest.txt
+            reports/cosign-verify-attestation.txt
+            reports/cosign-verify-attestation.json
+
+  # Procedencia SLSA generada por el workflow reutilizable oficial, aislado del job de build.
+  provenance:
+    name: Procedencia SLSA
+    needs: build
+    permissions:
+      actions: read     # leer el contexto del workflow
+      id-token: write   # firmar la procedencia
+      packages: write   # subir la procedencia a GHCR
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
+    with:
+      image: ${{ needs.build.outputs.image }}
+      digest: ${{ needs.build.outputs.digest }}
+      registry-username: ${{ github.actor }}
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}
+
+  verificar:
+    name: Verificar procedencia SLSA
+    needs: [build, provenance]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read
+    env:
+      REF: ${{ needs.build.outputs.image }}@${{ needs.build.outputs.digest }}
+    steps:
+      - uses: slsa-framework/slsa-verifier/actions/installer@v2.7.1
+
+      - uses: sigstore/cosign-installer@v4.1.2
+
+      - name: slsa-verifier verify-image
+        run: |
+          mkdir -p reports
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          slsa-verifier verify-image "$REF" \
+            --source-uri "github.com/${{ github.repository }}" \
+            --source-branch main \
+            --print-provenance > reports/procedencia-slsa.json 2> reports/slsa-verifier.txt
+          cat reports/slsa-verifier.txt
+
+      - name: cosign verify-attestation (procedencia SLSA)
+        run: |
+          cosign verify-attestation --type slsaprovenance "$REF" \
+            --certificate-identity "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@refs/tags/v2.1.0" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            > /dev/null 2> reports/cosign-verify-slsa.txt
+          cat reports/cosign-verify-slsa.txt
+
+      - name: Conservar procedencia SLSA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: procedencia-slsa
+          path: reports/

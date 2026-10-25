@@ -1,0 +1,14 @@
+> scripts/04-sbom-imagen.ps1   (imagen compilada con golang:1.22)
+=== SBOM de la imagen lab246:1.0.0 ===
+exit=0
+
+bomFormat: CycloneDX  specVersion: 1.7
+componentes: 958 (8 paquetes y 950 archivos con hash)
+  - library          base-files         12.4+deb12u15            sha256:fd7e4aae7e7b05f217bcf2d02322825c360e66c52c4c2f1b28d784d6297a1c23
+  - library          ca-certificates    20250419~deb12u1         GPL-2.0-only,GPL-2.0-or-later,MPL-2.0
+  - library          lab246             UNKNOWN                  
+  - library          media-types        10.0.0                   ad-hoc
+  - library          netbase            6.4                      GPL-2.0-only
+  - library          stdlib             go1.22.12                BSD-3-Clause
+  - library          tzdata             2026b-0+deb12u1          public-domain
+  - operating-system debian             12.15                    
